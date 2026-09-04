@@ -1,0 +1,51 @@
+[
+  {
+    "id": "acceptance_01_blueharbor_proof",
+    "difficulty": "easy",
+    "question": "which customer's issue started after the 2026-02-20 taxonomy rollout, and what proof plan did we propose to get them comfortable with renewal?",
+    "required_terms": ["BlueHarbor Logistics", "7-10 business day", "index weighting", "taxonomy mapping layer", "A/B test", "top 20 saved", "top-5 correct hit rate", "80"],
+    "gold_evidence_ids": ["art_0bccc580184e", "art_bd3560dfe194", "art_3e9031389474", "art_8b0063fbb3cb"]
+  },
+  {
+    "id": "acceptance_02_verdant_patch",
+    "difficulty": "easy",
+    "question": "for Verdant Bay, what's the approved live patch window, and exactly how do we roll back if the validation checks fail?",
+    "required_terms": ["2026-03-24", "02:00", "04:00", "orchestrator rollback --target ruleset=<prior_sha>", "rehydrates prior rules", "invalidation hook"],
+    "gold_evidence_ids": ["art_fff67d92fe41", "art_f893faeda15a", "art_f60d368c4493"]
+  },
+  {
+    "id": "acceptance_03_mapleharvest_mapping",
+    "difficulty": "easy",
+    "question": "in the MapleHarvest Quebec pilot, what temporary field mappings are we planning in the router transform, and what is the March 23 workshop supposed to produce?",
+    "required_terms": ["txn_id", "transaction_id", "total_amount", "amount_cents", "string", "integers", "store_id", "register_id", "2026-03-23", "canonical schema", "alias mappings", "migration milestones", "signed schema document", "SI-SCHEMA-REG"],
+    "gold_evidence_ids": ["art_6c5bb3a4b89f", "art_5a91258f4056", "art_d1d599719fb2"]
+  },
+  {
+    "id": "acceptance_04_aureum_scim",
+    "difficulty": "easy",
+    "question": "what SCIM fields were conflicting at Aureum, and what fast fix did Jin propose so we don't have to wait on Okta change control?",
+    "required_terms": ["department", "businessUnit", "hot-reloadable", "Signal Ingest", "preprocessing", "canonical field", "SCIM tracing", "approval latency"],
+    "gold_evidence_ids": ["art_79f625aafa16", "art_e60697c15fce", "art_545110f843dc"]
+  },
+  {
+    "id": "acceptance_05_defection_risk",
+    "difficulty": "hard",
+    "question": "which customer looks most likely to defect to a cheaper tactical competitor if we miss the next promised milestone, and what exactly is that milestone?",
+    "required_terms": ["BlueHarbor Logistics", "NoiseGuard", "low-cost", "7-10 business day", "2026-03-19", "2026-03-22", "top 20 saved", "top-5 correct hit rate", "80", "no suppression regression"],
+    "gold_evidence_ids": ["art_c9970c1dc932", "art_0bccc580184e", "art_bd3560dfe194"]
+  },
+  {
+    "id": "acceptance_06_event_nexus_groups",
+    "difficulty": "hard",
+    "question": "among the North America West Event Nexus accounts, which ones are really dealing with taxonomy/search semantics problems versus duplicate-action problems?",
+    "required_terms": ["Arcadia Cloudworks", "BlueHarbor Logistics", "CedarWind Renewables", "HelioFab Systems", "Pacific Health Network", "Pioneer Freight Solutions", "Helix Assemblies Inc.", "LedgerBright Analytics", "LedgerPeak Software", "MedLogix Distribution", "Peregrine Logistics Group", "Pioneer Grid Retail LLC"],
+    "gold_evidence_ids": ["art_90991e25335f", "art_8b0063fbb3cb", "art_10f7e8b72e09", "art_9345d5653840", "art_4eccfd9dcf29", "art_3ba29fe1e026", "art_0ac4efa5a0ff", "art_8478ccd5b200", "art_2f780acc1f96", "art_87b096c2c2d3", "art_0927b1cbb7f4", "art_f64972a66eeb"]
+  },
+  {
+    "id": "acceptance_07_canada_pattern",
+    "difficulty": "hard",
+    "question": "do we have a recurring Canada approval-bypass pattern across accounts, or is MapleBridge basically a one-off? Give me the customer names and the shared failure pattern in plain English.",
+    "required_terms": ["recurring", "MapleBridge Insurance", "City of Verdant Bay", "Maple Regional Transit Authority", "MapleBay Marketplace", "MapleFork Franchise Systems", "MaplePath Career Institute", "MapleWest Bank", "migration", "precedence", "cache", "alias", "schema", "province", "Canada", "approval"],
+    "gold_evidence_ids": ["art_e697b3abe158", "art_fff67d92fe41", "art_cf6f9e07e25a", "art_d57377f0810c", "art_ad58f3ce1afd", "art_6bae2f4ff91f", "art_364eddbcbfe8"]
+  }
+]

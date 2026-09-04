@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-03",
+  "openai_roles": {
+    "direct": "gpt-5.4-mini",
+    "investigation_and_synthesis": "gpt-5.4-mini",
+    "repair": "gpt-5.4-mini",
+    "evaluation": "gpt-5.4-mini"
+  },
+  "socket_mode": {
+    "connected": true,
+    "session": "redacted",
+    "clean_shutdown": true
+  },
+  "slack_mention": {
+    "workspace_channel": "redacted demo channel",
+    "event_id": "redacted",
+    "threaded_reply": true,
+    "latency_ms": 3599,
+    "tool_calls": 1,
+    "model_calls": 2,
+    "grounded_repair_calls": 1,
+    "input_tokens": 24287,
+    "output_tokens": 254,
+    "patch_window_present": true,
+    "exact_rollback_command_present": true,
+    "rehydration_behavior_present": true,
+    "invalidation_hook_present": true,
+    "readable_source_title_present": true,
+    "raw_evidence_ids_absent": true
+  },
+  "langsmith": {
+    "experiment": "slack-db-bot-gpt-5.4-mini-gpt-5.4-mini-0b4a928b",
+    "runs": 7,
+    "quality_gates_passed": 7
+  }
+}

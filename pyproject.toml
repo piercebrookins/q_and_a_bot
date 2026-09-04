@@ -1,0 +1,59 @@
+[project]
+name = "slack-db-bot"
+version = "0.1.0"
+description = "Grounded Slack Socket Mode Q&A bot for the Applied AI take-home"
+authors = [{ name = "Pierce Brookins" }]
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.13,<4",
+    "aiosqlite>=0.22,<1",
+    "deepagents>=0.3,<1",
+    "fastembed>=0.7,<1",
+    "langchain-openai>=1.0,<2",
+    "langgraph>=1.0,<2",
+    "langgraph-checkpoint-sqlite>=3,<4",
+    "langsmith>=0.7,<1",
+    "numpy>=2,<3",
+    "pydantic-settings>=2.12,<3",
+    "slack-bolt>=1.27,<2",
+    "sqlglot>=28,<29",
+    "structlog>=25,<26",
+]
+
+[project.scripts]
+slack-db-bot = "slack_db_bot.main:cli"
+slack-db-eval = "slack_db_bot.evaluation:cli"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "BLE", "TRY", "RUF", "ASYNC"]
+ignore = ["TRY003", "TRY300", "TRY400"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+check_untyped_defs = true
+no_implicit_optional = true
+plugins = ["pydantic.mypy"]
+
+[build-system]
+requires = ["uv_build>=0.8.11,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19,<2",
+    "pytest>=9,<10",
+    "pytest-asyncio>=1.3,<2",
+    "pytest-cov>=7,<8",
+    "ruff>=0.14,<1",
+]
