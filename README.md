@@ -20,6 +20,7 @@
 
 <div align="center">
   <a href="https://www.loom.com/share/2ef9998a23934dde845720559fdfd84c"><img src="https://img.shields.io/badge/▶_Watch_the_demo-Loom-625DF5?style=for-the-badge&amp;logo=loom&amp;logoColor=white" alt="Watch the Loom demo"></a>
+  <p><strong><a href="https://www.loom.com/share/2ef9998a23934dde845720559fdfd84c">▶ Watch the full video demo on Loom →</a></strong></p>
 </div>
 
 <br>
