@@ -18,6 +18,10 @@
   <img src="https://img.shields.io/badge/tests-59_passing-2E7D32" alt="59 tests passing">
 </div>
 
+<div align="center">
+  <a href="https://www.loom.com/share/2ef9998a23934dde845720559fdfd84c"><img src="https://img.shields.io/badge/▶_Watch_the_demo-Loom-625DF5?style=for-the-badge&amp;logo=loom&amp;logoColor=white" alt="Watch the Loom demo"></a>
+</div>
+
 <br>
 
 Grounded Q&amp;A Bot is a local Slack Socket Mode application over a synthetic startup SQLite database. It answers
