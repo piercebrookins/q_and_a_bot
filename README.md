@@ -1,60 +1,111 @@
-# Grounded Slack database Q&A bot
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/logo-light.svg">
+    <img alt="Grounded Q&amp;A Bot" src="docs/images/logo-light.svg" width="68%">
+  </picture>
+</div>
 
-This repository runs a local Slack Socket Mode bot over the supplied synthetic SQLite database. It answers explicit
-mentions and unmentioned follow-ups in an already engaged thread, shows readable source titles backed by stable
-internal evidence IDs, labels inference, exposes gaps and conflicts, and refuses unsupported questions.
+<div align="center">
+  <h3>Grounded database answers, delivered naturally in Slack.</h3>
+</div>
 
-The implementation uses an explicit LangGraph `StateGraph`. Every generation, investigation, synthesis, repair, and
-evaluation model call uses GPT-5.4 mini. Direct questions use one hybrid retrieval pass. Comparisons, recurring
-patterns, and superlatives use a bounded Deep Agents investigator before grounded synthesis. Retrieval combines
-read-only structured SQLite, FTS5, and a local FastEmbed index with reciprocal rank fusion and deterministic entity,
-date, and coverage rules. LangSmith records privacy-redacted execution traces and runs the seven-case evaluation suite.
+<div align="center">
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&amp;logoColor=white" alt="Python 3.12">
+  <img src="https://img.shields.io/badge/LangGraph-StateGraph-1C3C3C" alt="LangGraph StateGraph">
+  <img src="https://img.shields.io/badge/Deep_Agents-investigator-0F6B52" alt="Deep Agents investigator">
+  <img src="https://img.shields.io/badge/LangSmith-7%2F7-6C47FF" alt="LangSmith evaluation: 7 of 7">
+  <img src="https://img.shields.io/badge/tests-59_passing-2E7D32" alt="59 tests passing">
+</div>
 
-## LangSmith tracing and evaluation
+<br>
 
-LangSmith is integrated into both the application and its evaluation workflow. With `LANGSMITH_TRACING=true`, graph,
-model, and `search_database` spans are recorded under the configured project while
-`LANGSMITH_HIDE_INPUTS=true` and `LANGSMITH_HIDE_OUTPUTS=true` keep Slack messages, database excerpts, and generated
-answers out of runtime traces. The `slack-db-eval --langsmith` command runs the real graph against the versioned
-seven-case dataset and attaches the deterministic and semantic quality gate to every example.
+Grounded Q&amp;A Bot is a local Slack Socket Mode application over a synthetic startup SQLite database. It answers
+direct lookups, account summaries, comparisons, and multi-source questions while exposing readable evidence, labeling
+inference, surfacing gaps, and declining claims the database cannot support.
 
-The final [`slack-db-bot-gpt-5.4-mini-gpt-5.4-mini-0b4a928b`](https://smith.langchain.com/o/b966086f-707d-4439-bdef-9e441ce1ceee/datasets/29233e7f-4918-473a-a608-b397859e763a/compare?selectedSessions=83b07b2b-1010-40d6-8fa3-b41a7154bab7)
-experiment ran all seven assignment cases through the application and passed all seven quality gates. Detailed measured
-results and limitations are recorded in [`EVALUATION.md`](EVALUATION.md).
+The application combines an explicit LangGraph workflow, a narrowly scoped Deep Agents investigator, hybrid retrieval,
+deterministic grounding checks, persistent thread memory, and privacy-redacted LangSmith tracing and evaluation.
 
-![LangSmith evaluation showing the versioned examples, retrieval tool calls, and GPT-5.4 mini model spans](docs/images/langsmith-evaluation.png)
+> [!TIP]
+> Start with the human-authored [`DESIGN.md`](DESIGN.md) for the decisions behind the system and
+> [`EVALUATION.md`](EVALUATION.md) for measured results, failures, and limitations.
 
-## Local setup
+## Why this bot?
 
-Prerequisites are Python 3.12+, [uv](https://docs.astral.sh/uv/), a Slack app installed in a test workspace, and an
-OpenAI API key.
+- **Grounded by construction** — every answer claim maps to retrieved evidence; numeric details must appear in cited
+  excerpts, and Slack shows readable source titles instead of internal IDs.
+- **Controlled orchestration** — LangGraph owns routing, retrieval, synthesis, validation, budgets, and delivery. The
+  bounded Deep Agents investigator is reserved for comparisons, recurring patterns, and superlative questions.
+- **Hybrid retrieval** — read-only structured SQLite, FTS5, and local FastEmbed vectors are fused and reranked with
+  deterministic entity, date, source-status, and coverage rules.
+- **Slack-native conversations** — explicit mentions begin a conversation, unmentioned follow-ups work inside engaged
+  threads, progress uses a lightweight reaction, and long answers fall back to a Markdown attachment.
+- **Security and reliability boundaries** — workspace/channel authorization, read-only SQL, prompt-injection defenses,
+  event deduplication, ordered per-thread queues, bounded retries, timeouts, and persistent conversation state.
+- **Measured behavior** — 59 focused tests, seven assignment acceptance cases, a 7/7 LangSmith experiment, and a real
+  Slack/OpenAI smoke test.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[Slack Socket Mode] --> B[Normalize + authorize]
+    B --> C[Deduplicate + queue by thread]
+    C --> D{LangGraph router}
+    D -->|Direct| E[Hybrid retrieval]
+    D -->|Multi-source| F[Bounded Deep Agents investigator]
+    F --> E
+    E --> G[Structured synthesis]
+    G --> H[Deterministic grounding validator]
+    H --> I[Threaded Slack answer + readable sources]
+```
+
+The model receives one `search_database` tool. It cannot access Slack delivery, the host filesystem, a shell, arbitrary
+network calls, or unrestricted SQL. Every OpenAI role—direct answering, investigation, synthesis, repair, and semantic
+evaluation—uses `gpt-5.4-mini` in the measured configuration.
+
+## Quickstart
+
+Prerequisites: Python 3.12+, [uv](https://docs.astral.sh/uv/), an OpenAI API key, and a Slack app installed in a test
+workspace.
 
 ```bash
+git clone https://github.com/piercebrookins/q_and_a_bot.git
+cd q_and_a_bot
 uv sync --all-groups
 cp .env.example .env
 ```
 
+Fill in the required values in `.env`:
+
+```dotenv
+SLACK_BOT_TOKEN=xoxb-...
+SLACK_APP_TOKEN=xapp-...
+SLACK_ALLOWED_WORKSPACE_ID=T...
+SLACK_ALLOWED_CHANNEL_IDS=C...
+SLACK_TEST_CHANNEL_ID=C...
+OPENAI_API_KEY=...
+```
+
 Create or update the Slack app from [`slack-manifest.yaml`](slack-manifest.yaml). Generate an app-level token with
-`connections:write`, install the app, invite it to the test channel, and fill the Slack IDs and tokens in `.env`.
-`SLACK_TEST_CHANNEL_ID` must also appear in `SLACK_ALLOWED_CHANNEL_IDS`. Event Subscriptions must be enabled with
-`app_mention` and `message.channels`; Socket Mode does not use a request URL.
+`connections:write`, install the app, invite it to the allowed test channel, and confirm Event Subscriptions include
+`app_mention` and `message.channels`. Socket Mode does not require a public request URL or signing secret.
 
-The default database URL is pinned to a Git commit and verified with SHA-256 before use. To avoid downloading it, put
-the same verified snapshot at `DATABASE_PATH`. The source is opened with SQLite `mode=ro`, `immutable=1`,
-`query_only=ON`, and a deterministic SQL allowlist. Runtime state is written only under `.data/`.
-
-Start the bot:
+Run the bot:
 
 ```bash
 uv run slack-db-bot
 ```
 
-Mention `@LangChain Bot` in an allowed public channel. Replies stay in the source thread. A plain thread follow-up is
-accepted after the first mention. Direct messages are outside the assignment scope and are rejected. The bot
-broadcasts a reply only when the request explicitly says to share or post it to the channel. Answers longer than
-Slack's safe message size get a thread summary and Markdown attachment.
+Mention `@LangChain Bot` in an allowed public channel. The answer appears in the source thread, and later messages in
+that engaged thread work without another mention. Stop the local process with `Ctrl-C`.
 
-## Tests and evaluation
+> [!NOTE]
+> The pinned database snapshot downloads automatically and is verified with SHA-256. Set `DATABASE_PATH` to use an
+> existing verified copy instead. Runtime databases, vectors, traces, and secrets stay under ignored local paths.
+
+## Evaluation
 
 ```bash
 uv run ruff check .
@@ -64,34 +115,56 @@ uv run slack-db-eval --output evaluation/results/latest.json
 uv run slack-db-eval --langsmith
 ```
 
-The test suite covers the SQL guard and immutable database, hybrid retrieval, deterministic grounding, prompt
-injection, bounded conversation memory, event-ledger crash recovery, Slack authorization and engagement, ordered
-follow-ups, deduplication, explicit broadcasting, dependency failure, and long-answer attachment delivery. The
-packaged seven-case dataset is
-[`src/slack_db_bot/data/acceptance.json`](src/slack_db_bot/data/acceptance.json); measured results and known limits are in
-[`EVALUATION.md`](EVALUATION.md).
+| Gate | Measured result |
+| --- | ---: |
+| Unit, component, and mocked end-to-end tests | 59 passed |
+| Assignment acceptance cases | 7/7 |
+| Required-concept recall | 100% |
+| Mean graph latency | 7,163 ms |
+| LangSmith quality gates | 7/7 |
+| Live Slack response latency | 3,599 ms |
 
-## Security and operations
+The versioned acceptance dataset is [`src/slack_db_bot/data/acceptance.json`](src/slack_db_bot/data/acceptance.json).
+The saved local results are in [`evaluation/results/latest.json`](evaluation/results/latest.json), and the complete
+methodology and limitations are in [`EVALUATION.md`](EVALUATION.md).
 
-Only configured workspace and channel IDs are accepted. The model receives one read-only search tool and no shell,
-filesystem, MCP, arbitrary network, or Slack tools. SQL permits one bounded `SELECT` over allowlisted tables, columns,
-and functions. Retrieved text is marked as untrusted, structured answers must map claims to retrieved evidence, inferences need
-two sources, numeric details must occur in cited excerpts, and Slack delivery uses the authenticated source channel and
-thread only.
+## LangSmith
 
-Each turn has explicit model, tool, rewrite, Slack-call, output-token, queue, concurrency, and 120-second wall-clock
-limits. OpenAI transport retries are disabled; one grounded repair is allowed. Slack calls use a 15-second timeout and
-one bounded retry for short `429` responses. Event and conversation records expire after 30 days, old thread turns are
-compacted into a bounded extractive summary, and an interrupted event claim becomes retryable after 10 minutes.
+LangSmith is part of both the application and evaluation workflow. With `LANGSMITH_TRACING=true`, the graph records
+model, tool, and state-transition metadata under the configured project. `LANGSMITH_HIDE_INPUTS=true` and
+`LANGSMITH_HIDE_OUTPUTS=true` keep Slack messages, database excerpts, and generated answers out of runtime traces.
 
-Logs contain event IDs, hashed thread keys, latency, calls, rewrites, and token counts; they omit prompts, evidence,
-answers, users, and credentials. Set `LANGSMITH_HIDE_INPUTS=true` and `LANGSMITH_HIDE_OUTPUTS=true` so traces retain
-execution metadata without Slack text or database excerpts. Evaluation examples are synthetic.
+The final
+[`slack-db-bot-gpt-5.4-mini-gpt-5.4-mini-0b4a928b`](https://smith.langchain.com/o/b966086f-707d-4439-bdef-9e441ce1ceee/datasets/29233e7f-4918-473a-a608-b397859e763a/compare?selectedSessions=83b07b2b-1010-40d6-8fa3-b41a7154bab7)
+experiment ran the real graph for all seven assignment cases and passed every quality gate.
 
-Secrets belong only in `.env`, which is gitignored. `.data/`, semantic vectors, checkpoints, event history, and local
-traces are also gitignored. Stop the process with Ctrl-C; the Socket Mode session and checkpoint connection close
-cleanly.
+![LangSmith evaluation showing versioned examples, retrieval calls, and GPT-5.4 mini spans](docs/images/langsmith-evaluation.png)
 
-## Design submission
+## Security and reliability
 
-[`DESIGN.md`](DESIGN.md) is the required human-authored explanation of the architecture and tradeoffs.
+- The source database opens with SQLite `mode=ro`, `immutable=1`, and `query_only=ON`.
+- SQL permits one bounded `SELECT` over explicitly allowed tables, columns, and functions.
+- Retrieved records and conversation text are treated as untrusted data and cannot change policy or tool access.
+- Authenticated workspace, channel, thread, and recipient identities constrain every Slack action.
+- Each turn has model, tool, rewrite, Slack-call, output-token, concurrency, queue, and 120-second wall-clock limits.
+- The persistent ledger deduplicates Slack event IDs and reclaims interrupted claims after ten minutes.
+- Thread state retains 12 exact turns plus a bounded extractive summary; event and conversation records expire after 30
+  days.
+- Structured logs retain correlation IDs and metrics while omitting prompts, evidence, answers, users, and credentials.
+
+> [!IMPORTANT]
+> Secrets belong only in the ignored `.env` file. Never commit tokens, local runtime databases, trace exports, or
+> workspace identifiers.
+
+## Scope and limitations
+
+This is one local Python process using Slack Socket Mode. Its event ledger is persistent, but the in-memory work queue
+is not durable across a process crash. Direct messages, private channels, feedback UI, hosted deployment, and row-level
+database entitlements are outside the selected take-home scope.
+
+## Project resources
+
+- [`DESIGN.md`](DESIGN.md) — human-authored architecture and tradeoffs
+- [`EVALUATION.md`](EVALUATION.md) — measured quality, latency, token, and tool-call results
+- [`slack-manifest.yaml`](slack-manifest.yaml) — least-privilege Slack application manifest
+- [LangSmith experiment](https://smith.langchain.com/o/b966086f-707d-4439-bdef-9e441ce1ceee/datasets/29233e7f-4918-473a-a608-b397859e763a/compare?selectedSessions=83b07b2b-1010-40d6-8fa3-b41a7154bab7) — final seven-case evaluation

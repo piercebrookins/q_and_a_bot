@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="240" viewBox="0 0 1200 240" role="img" aria-labelledby="title desc">
+  <title id="title">Grounded Q&amp;A Bot</title>
+  <desc id="desc">A database connected to a chat bubble beside the Grounded Q&amp;A Bot wordmark.</desc>
+  <g transform="translate(28 30)">
+    <rect width="180" height="180" rx="42" fill="#E7F6F0"/>
+    <ellipse cx="67" cy="59" rx="35" ry="15" fill="#0F6B52"/>
+    <path d="M32 59v54c0 8 16 15 35 15s35-7 35-15V59" fill="none" stroke="#0F6B52" stroke-width="10"/>
+    <path d="M32 86c0 8 16 15 35 15s35-7 35-15" fill="none" stroke="#0F6B52" stroke-width="7"/>
+    <path d="M112 61h29c9 0 16 7 16 16v27c0 9-7 16-16 16h-8l-14 17v-17h-7c-9 0-16-7-16-16V77c0-9 7-16 16-16Z" fill="#FFFFFF" stroke="#0F6B52" stroke-width="8" stroke-linejoin="round"/>
+    <circle cx="116" cy="91" r="4" fill="#0F6B52"/><circle cx="127" cy="91" r="4" fill="#0F6B52"/><circle cx="138" cy="91" r="4" fill="#0F6B52"/>
+  </g>
+  <text x="242" y="112" fill="#102A24" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="67" font-weight="720" letter-spacing="-2">Grounded Q&amp;A Bot</text>
+  <text x="246" y="161" fill="#55736A" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="25" font-weight="500" letter-spacing="3">SLACK · SQLITE · LANGGRAPH</text>
+</svg>
