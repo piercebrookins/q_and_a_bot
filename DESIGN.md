@@ -8,25 +8,31 @@ Architecture: The architecture is based on an explicit LangGraph StateGraph. We�
 
 Request Flow:
 
-The request flow should be 
+The request flow should be
 
-1. Slack receives a socket mode event and acknowledges it promptly  
-2. When is @bot mentioned, the conversation begins with later messages triggering the bot only inside an already engaged thread  
-3. Event recorded in the deduplication database and placed in the queue for the thread  
-4. A routing node identifies the question type and creates a retrieval plan, keeping in mind the bounded limits  
-5. It’ll use the retrieval layer combining structured SQL, FTS5 search, and local semantic retrieval (only pulling from each when needed)  
-6. LangGraph will make sure the retrieved evidence is relevant and sufficient, and attempt at most 2 query rewrites and 8 retrieval/tool calls  
-7. A synthesis node creates an answer containing any claims, evidence IDs, fact labels, uncertainty, and conflict notes  
-8. The deterministic validator rejects any unsupported claims, invented citations, bad output, or unauthorized delivery behavior  
-9. Slack bot posts one response in the original thread 
+1. Slack receives a socket mode event and acknowledges it promptly
+2. When is @bot mentioned, the conversation begins with later messages triggering the bot only inside an already engaged thread
+3. Event recorded in the deduplication database and placed in the queue for the thread
+4. A routing node identifies the question type and creates a retrieval plan, keeping in mind the bounded limits
+5. It’ll use the retrieval layer combining structured SQL, FTS5 search, and local semantic retrieval (only pulling from each when needed)
+6. LangGraph will make sure the retrieved evidence is relevant and sufficient, and attempt at most 2 query rewrites and 8 retrieval/tool calls
+7. A synthesis node creates an answer containing any claims, evidence IDs, fact labels, uncertainty, and conflict notes
+8. The deterministic validator rejects any unsupported claims, invented citations, bad output, or unauthorized delivery behavior
+9. Slack bot posts one response in the original thread
+
+User Experience:
+
+Slack doesn't support streaming messages, so how do I make a slower agent feel responsive? I add an `eyes` reaction as soon as the bot accepts a message, which gives the user immediate feedback that it is working. My measured response times are typically only a few seconds, and the reaction disappears when the final answer is posted.
+
+How do I handle threads and long conversations? I keep every response inside the original Slack thread so the conversation stays organized. For context, I retain the 12 most recent turns exactly and roll older messages into a bounded summary, which lets follow-up questions build on the conversation without letting the prompt grow forever.
 
 State/Memory: The graph state includes the Slack request context, recent messages, rolling conversation summary, evidence, previous answers, and delivery status. The request identity should be immutable for a turn since messages are appended.
 
-Long threads should retain recent exact turns \+ a rolling summary with unresolved questions, previously cited/solved Q\&A, and evidence. 
+Long threads should retain recent exact turns \+ a rolling summary with unresolved questions, previously cited/solved Q\&A, and evidence.
 
 Database \+ Retrieval: The given database is going to be in read-only mode. The retrieval layer is going to use structured SQL for exact filters/comparisons, FTS5 for keyword/phrase matching, and a small local semantic index for questions where wording differs from the source. Then the results are combined and re-ranked based on entity matches, source status, and date.
 
-Answer format: The model should return a structured answer with response, evidence IDs, fact labels, uncertainty, and any abstaining results. This Slack response should lead with the answer and include compact source references. 
+Answer format: The model should return a structured answer with response, evidence IDs, fact labels, uncertainty, and any abstaining results. This Slack response should lead with the answer and include compact source references.
 
 Security: Slack messages, search results, database rows, summaries, and Deep Agents outputs should be treated as untrusted data. While they can provide evidence, they can’t override system rules or get access to more tools.
 
@@ -34,4 +40,4 @@ This is enforced via deterministic code. The model won’t have access to the ho
 
 Evaluation: We’ll require the 7 assignment questions to be accepted, with each question having a defined rubric, and they should be reviewed by a human.
 
-Results: The final submission should have answer correctness, completeness, citation quality, latency time, reliability, token usage, and tool call count. 
+Results: The final submission should have answer correctness, completeness, citation quality, latency time, reliability, token usage, and tool call count.

@@ -50,6 +50,18 @@ deterministic grounding checks, persistent thread memory, and privacy-redacted L
 - **Measured behavior** — 59 focused tests, seven assignment acceptance cases, a 7/7 LangSmith experiment, and a real
   Slack/OpenAI smoke test.
 
+### Slack doesn't support streaming messages, so how do I make a slower agent feel responsive?
+
+I add an `eyes` reaction as soon as the bot accepts a message, which gives the user immediate feedback that it is
+working. My measured response times are typically only a few seconds, and the reaction disappears when the final
+answer is posted.
+
+### How do I handle threads and long conversations?
+
+I keep every response inside the original Slack thread so the conversation stays organized. For context, I retain the
+12 most recent turns exactly and roll older messages into a bounded summary, which lets follow-up questions build on
+the conversation without letting the prompt grow forever.
+
 ## Architecture
 
 ```mermaid
